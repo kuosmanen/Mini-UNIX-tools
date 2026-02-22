@@ -40,6 +40,12 @@ In the main function, memory is allocated for a ThreadData struct for each filen
 Each thread runs the zip function, which compresses the file and writes the result to a file. After writing, the struct memory is freed and execution returns to the main function.
 In the main function, the temporary file is printed to stdout as the threads return. After printing the contents of the temporary file, the temporary file is deleted, and the program waits for the next temporary file to finish. This is repeated until all files have been printed.
 
+## reverse (custom utility)
+The reverse program reads lines from a file and writes them in reverse order to a specified output file.
+If the user provides only one argument, the program reads the lines from the file and prints them to the screen (stdout).
+If the user provides no command-line arguments at all, the program uses standard input (stdin). The user can type lines into the console, and when the user ends the input (for example by pressing CTRL+D), the lines they entered are printed to the screen (stdout).
+It uses getline() to read lines dynamically and stores pointers to the lines in a dynamically resized list using realloc(). The lines are then written in reverse order. After completion, allocated memory is freed and files are closed.
+
 ---
 
 # Descriptions in Finnish
@@ -68,4 +74,10 @@ Tämä jatkuu, kunnes tiedostot päätyvät.
 `parallelzip` ohjelmassa hyödynnetään tilapäisiä tekstitiedostoja, joihin jokaiseen kirjoitetaan tiedoston zipattu muoto. Kaikille komentoriviargumenteissa annetuille tiedostoille luodaan oma tilapäinen tiedosto. Ohjelma siis zippaa kaikkia annettuja tiedostoja rinnakkaisesti samaan aikaan. Tämä nopeuttaa zippaamista siten, että zippaamiseen kulut aika on (noin) sama, mikä kuluisi normaalissa peräkkäisessä zippaamisessa pelkästään pisimmän tiedoston zippaamiseen. 
 Main-funktiossa varataan muistia ThreadData structille jokaista komentoriville annettua tiedostonimiargumenttia kohden. Structiin lisätään osoitin avattuun tiedostoon, ja zipatun tiedoston kirjoittamista varten tilapäinen tiedostonimi. Tämän jälkeen luodaan threadi, ja tehdään sama seuraavalle tiedostolle.  
 Jokainen threadi ajaa zip-funktiota, joka zippaa tiedoston, ja kirjoittaa tuloksen tiedostoon. Kirjoituksen jälkeen vapautetaan structin muisti ja palataan main-funktioon. 
-Main-funktiossa tulostetaan stdout:iin tilapäinen tiedosto threadien palatessa. Tilapäisen tiedoston sisällön tulostamisen jälkeen poistetaan tilapäinen tiedosto, ja siirrytään odottamaan seuraavan tilapäisen tiedoston valmistumista. Tätä toistetaan, kunnes kaikki tiedostot on tulostettu. 
+Main-funktiossa tulostetaan stdout:iin tilapäinen tiedosto threadien palatessa. Tilapäisen tiedoston sisällön tulostamisen jälkeen poistetaan tilapäinen tiedosto, ja siirrytään odottamaan seuraavan tilapäisen tiedoston valmistumista. Tätä toistetaan, kunnes kaikki tiedostot on tulostettu.
+
+## reverse (custom ominaisuus)
+`reverse` ohjelma lukee rivit tiedostosta ja kirjoittaa ne käänteisessä järjestyksessä annettuun kohdetiedostoon.
+Jos käyttäjä antaa vain yhden argumentin, lukee ohjelma tiedoston rivit ja tulostaa ne näytölle (stdout).
+Jos käyttäjä ei anna komentoriviargumentteja ollenkaan, käyttää ohjelma stdin syötettä, eli käyttäjä voi kirjoittaa rivejä konsoliin, ja käyttäjän päättäessä syötön, eli painamalla CTRL+D, tulostuvat hänen kirjoittamat rivit näytölle (stdout). 
+Ohjelma käyttää getline()-funktiota rivien dynaamiseen lukemiseen ja tallentaa osoittimet riveihin dynaamisesti kasvatettavaan listaan realloc()-funktion avulla. Rivien lukemisen jälkeen ne kirjoitetaan käänteisessä järjestyksessä. Lopuksi varattu muisti vapautetaan ja tiedostot suljetaan.
