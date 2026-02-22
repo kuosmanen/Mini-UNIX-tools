@@ -4,6 +4,11 @@ This project demonstrates systems programming concepts including file I/O, strin
 
 ---
 
+## test.txt
+`test.txt` is a simple sample file used for testing the functionality of all the mini tools.
+It contains short lines, single-character lines, repeated characters (useful for RLE compression testing) and a sentence containing the word "get" to verify search functionality with grep.
+
+
 # Descriptions in English
 
 ## cat
