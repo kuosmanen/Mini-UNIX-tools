@@ -1,5 +1,5 @@
 # Mini-UNIX-tools
-Reimplementation of basic Unix utilities (cat, grep, zip, unzip) in C
+Reimplementation of basic Unix utilities (cat, grep, zip, unzip) and a parallelized version of zip (parallelzip) in C.
 This project demonstrates systems programming concepts including file I/O, string processing, binary data handling, and error handling.
 
 ---
@@ -29,12 +29,18 @@ The `unzip` program takes at least one command-line argument, decompresses the f
 Unzip opens the file, reads a binary number, and stores it in a variable. Then it reads the corresponding ASCII character and prints that character to stdout as many times as indicated by the number.
 This process continues until all files have been processed.
 
+## parallelzip
+The `parallelzip` program utilizes temporary text files, each of which stores the compressed version of a file. A separate temporary file is created for every file provided as a command-line argument. The program compresses all given files in parallel at the same time. This speeds up the compression so that the total time spent compressing is (approximately) the same as the time it would take to compress only the largest file in a normal sequential implementation.
+In the main function, memory is allocated for a ThreadData struct for each filename provided as a command-line argument. A pointer to the opened file is stored in the struct, along with a temporary filename used for writing the compressed output. After this, a thread is created, and the same process is repeated for the next file.
+Each thread runs the zip function, which compresses the file and writes the result to a file. After writing, the struct memory is freed and execution returns to the main function.
+In the main function, the temporary file is printed to stdout as the threads return. After printing the contents of the temporary file, the temporary file is deleted, and the program waits for the next temporary file to finish. This is repeated until all files have been printed.
+
 ---
 
 # Descriptions in Finnish
 
 ## cat
-`Cat` ohjelma ottaa komentoriviargumentteina tiedostopolkuja ja tulostaa niiden sisällön peräkkäin konsoliin.  
+`cat` ohjelma ottaa komentoriviargumentteina tiedostopolkuja ja tulostaa niiden sisällön peräkkäin konsoliin.  
 Ohjelma ilmoittaa käyttäjälle, mikäli argumentteja on liian vähän, jolloin prosessi lopettaa toimintansa ja palaa normaalisti arvolla 0. Jos kuitenkin tiedoston avaamisessa ilmenee virhe, lopettaa prosessi toiminnan, tulostaa käyttäjälle virheilmoituksen, ja palaa koodilla 1.
 
 ## grep
@@ -46,8 +52,15 @@ Ohjelma pystyy myös etsimään stdin-syötteestä käyttäjän konsoliin kirjoi
 
 ## zip
 `zip` ohjelma ottaa vähintään yhden komentorivi argumentin, kompressoi tiedoston käyttäen run length encoding. Tämä tulos tulostetaan sitten stdout:iin. 
-Ensin Zip avaa tiedoston, sitten lukee ensimmäisen merkin fgetc() funktiolla. Jos seuraava merkki on samanlainen kuin edellinen, lisätään counteriin 1. Kun seuraava merkki on joku muu kuin edellinen, kirjoitetaan stdout:iin sen hetkinen count numero binäärimuodossa ja merkki tavallisessa ASCII muodossa. Sitten aloitetaan laskeminen alusta, ja kirjoitetaan seuraava numero ja merkki. Tämä jatkuu, kunnes annetut tiedostot loppuvat. 
+Ensin zip avaa tiedoston, sitten lukee ensimmäisen merkin fgetc() funktiolla. Jos seuraava merkki on samanlainen kuin edellinen, lisätään counteriin 1. Kun seuraava merkki on joku muu kuin edellinen, kirjoitetaan stdout:iin sen hetkinen count numero binäärimuodossa ja merkki tavallisessa ASCII muodossa. Sitten aloitetaan laskeminen alusta, ja kirjoitetaan seuraava numero ja merkki. Tämä jatkuu, kunnes annetut tiedostot loppuvat. 
 
 ## unzip
 `unzip` ohjelma ottaa vähintään yhden komentorivi argumentin, dekompressoi tiedoston ja tulostaa alkuperäisen tekstin stdout:iin.
-Unzip avaa tiedoston, lukee binäärimuotoisen numeron ja tallentaa sen muuttujaan. Sen jälkeen luetaan ASCII merkki, ja tulostetaan numeron osoittaman verran merkkejä stdout:iin. Tämä jatkuu, kunnes tiedostot päätyvät. 
+Unzip avaa tiedoston, lukee binäärimuotoisen numeron ja tallentaa sen muuttujaan. Sen jälkeen luetaan ASCII merkki, ja tulostetaan numeron osoittaman verran merkkejä stdout:iin.
+Tämä jatkuu, kunnes tiedostot päätyvät.
+
+## parallelzip
+`parallelzip` ohjelmassa hyödynnetään tilapäisiä tekstitiedostoja, joihin jokaiseen kirjoitetaan tiedoston zipattu muoto. Kaikille komentoriviargumenteissa annetuille tiedostoille luodaan oma tilapäinen tiedosto. Ohjelma siis zippaa kaikkia annettuja tiedostoja rinnakkaisesti samaan aikaan. Tämä nopeuttaa zippaamista siten, että zippaamiseen kulut aika on (noin) sama, mikä kuluisi normaalissa peräkkäisessä zippaamisessa pelkästään pisimmän tiedoston zippaamiseen. 
+Main-funktiossa varataan muistia ThreadData structille jokaista komentoriville annettua tiedostonimiargumenttia kohden. Structiin lisätään osoitin avattuun tiedostoon, ja zipatun tiedoston kirjoittamista varten tilapäinen tiedostonimi. Tämän jälkeen luodaan threadi, ja tehdään sama seuraavalle tiedostolle.  
+Jokainen threadi ajaa zip-funktiota, joka zippaa tiedoston, ja kirjoittaa tuloksen tiedostoon. Kirjoituksen jälkeen vapautetaan structin muisti ja palataan main-funktioon. 
+Main-funktiossa tulostetaan stdout:iin tilapäinen tiedosto threadien palatessa. Tilapäisen tiedoston sisällön tulostamisen jälkeen poistetaan tilapäinen tiedosto, ja siirrytään odottamaan seuraavan tilapäisen tiedoston valmistumista. Tätä toistetaan, kunnes kaikki tiedostot on tulostettu. 
